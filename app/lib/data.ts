@@ -8,10 +8,71 @@ import {
   Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
+import { unstable_noStore as noStore } from 'next/cache';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+// 检查是否为Vercel构建环境
+const isVercelBuild = process.env.VERCEL_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build';
+
+// 模拟数据，用于构建时
+const mockRevenue = [
+  { month: 'Jan', revenue: 2000 },
+  { month: 'Feb', revenue: 1800 },
+  { month: 'Mar', revenue: 2200 },
+  { month: 'Apr', revenue: 2500 },
+  { month: 'May', revenue: 2300 },
+  { month: 'Jun', revenue: 3200 },
+  { month: 'Jul', revenue: 3500 },
+  { month: 'Aug', revenue: 3700 },
+  { month: 'Sep', revenue: 2500 },
+  { month: 'Oct', revenue: 2800 },
+  { month: 'Nov', revenue: 3000 },
+  { month: 'Dec', revenue: 4800 },
+];
+
+const mockLatestInvoices = [
+  {
+    id: '1',
+    name: '示例客户',
+    email: 'user@example.com',
+    image_url: '/customers/customer-1.png',
+    amount: '$250.00',
+  },
+  {
+    id: '2',
+    name: '示例客户2',
+    email: 'user2@example.com',
+    image_url: '/customers/customer-2.png',
+    amount: '$150.00',
+  },
+  {
+    id: '3',
+    name: '示例客户3',
+    email: 'user3@example.com',
+    image_url: '/customers/customer-3.png',
+    amount: '$350.00',
+  },
+];
+
+// 创建一个函数来安全地获取SQL客户端
+function getClient() {
+  if (!process.env.POSTGRES_URL || isVercelBuild) {
+    return null;
+  }
+  return postgres(process.env.POSTGRES_URL, { ssl: 'require' });
+}
+
+// 仅在非构建环境时初始化数据库连接
+const sql = getClient();
 
 export async function fetchRevenue() {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    console.log('使用模拟收入数据（构建环境）');
+    return mockRevenue;
+  }
+  
   try {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
@@ -31,6 +92,14 @@ export async function fetchRevenue() {
 }
 
 export async function fetchLatestInvoices() {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    console.log('使用模拟发票数据（构建环境）');
+    return mockLatestInvoices;
+  }
+  
   try {
     const data = await sql<LatestInvoiceRaw[]>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id

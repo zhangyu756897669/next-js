@@ -2,9 +2,8 @@ import { Card } from '@/app/ui/dashboard/cards';
 import RevenueChart from '@/app/ui/dashboard/revenue-chart';
 import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
 import { lusitana } from '@/app/ui/fonts';
-import { fetchRevenue ,fetchLatestInvoices } from '@/app/lib/data';
+import { mockRevenue } from '@/app/lib/mock-data';
 
- 
 /*************  ✨ Windsurf Command ⭐  *************/
 /**
  * Renders the main dashboard page of the application.
@@ -15,9 +14,9 @@ import { fetchRevenue ,fetchLatestInvoices } from '@/app/lib/data';
  */
 
 /*******  ee29c6ea-596e-4b0a-a95e-c43bf66e29ef  *******/
-export default async function Page() {
-  const revenue = await fetchRevenue();
-  const latestInvoices = await fetchLatestInvoices();
+export default function Page() {
+  // 在构建时使用模拟数据，而不是尝试从数据库获取
+  // 在实际运行时，RevenueChart 组件会在客户端获取真实数据
   return (
     <main>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -34,7 +33,7 @@ export default async function Page() {
         /> */}
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-        { <RevenueChart revenue={revenue}  /> }
+        <RevenueChart revenue={mockRevenue} />
         {/* <LatestInvoices latestInvoices={latestInvoices} /> */}
       </div>
     </main>
