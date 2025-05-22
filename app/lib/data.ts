@@ -119,7 +119,23 @@ export async function fetchLatestInvoices() {
   }
 }
 
+// 模拟卡片数据
+const mockCardData = {
+  numberOfCustomers: 10,
+  numberOfInvoices: 25,
+  totalPaidInvoices: '$12,000.00',
+  totalPendingInvoices: '$5,000.00',
+};
+
 export async function fetchCardData() {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    console.log('使用模拟卡片数据（构建环境）');
+    return mockCardData;
+  }
+  
   try {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
@@ -154,11 +170,41 @@ export async function fetchCardData() {
   }
 }
 
+// 模拟发票数据
+const mockFilteredInvoices = [
+  {
+    id: '1',
+    amount: 15000,
+    date: '2023-12-01',
+    status: 'pending',
+    name: '示例客户',
+    email: 'user@example.com',
+    image_url: '/customers/customer-1.png',
+  },
+  {
+    id: '2',
+    amount: 20000,
+    date: '2023-11-15',
+    status: 'paid',
+    name: '示例客户2',
+    email: 'user2@example.com',
+    image_url: '/customers/customer-2.png',
+  },
+];
+
 const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
 ) {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    console.log('使用模拟筛选发票数据（构建环境）');
+    return mockFilteredInvoices;
+  }
+  
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
@@ -191,6 +237,13 @@ export async function fetchFilteredInvoices(
 }
 
 export async function fetchInvoicesPages(query: string) {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    return 1; // 只有一页模拟数据
+  }
+  
   try {
     const data = await sql`SELECT COUNT(*)
     FROM invoices
@@ -211,7 +264,23 @@ export async function fetchInvoicesPages(query: string) {
   }
 }
 
+// 模拟发票数据
+const mockInvoice = {
+  id: '1',
+  customer_id: '1',
+  amount: 150,
+  status: 'pending'
+};
+
 export async function fetchInvoiceById(id: string) {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    console.log('使用模拟发票详情数据（构建环境）');
+    return mockInvoice;
+  }
+  
   try {
     const data = await sql<InvoiceForm[]>`
       SELECT
@@ -236,7 +305,21 @@ export async function fetchInvoiceById(id: string) {
   }
 }
 
+// 模拟客户数据
+const mockCustomers = [
+  { id: '1', name: '示例客户' },
+  { id: '2', name: '示例客户2' },
+];
+
 export async function fetchCustomers() {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    console.log('使用模拟客户数据（构建环境）');
+    return mockCustomers;
+  }
+  
   try {
     const customers = await sql<CustomerField[]>`
       SELECT
@@ -253,7 +336,37 @@ export async function fetchCustomers() {
   }
 }
 
+// 模拟筛选客户数据
+const mockFilteredCustomers = [
+  {
+    id: '1',
+    name: '示例客户',
+    email: 'user@example.com',
+    image_url: '/customers/customer-1.png',
+    total_invoices: 5,
+    total_pending: '$2,000.00',
+    total_paid: '$5,000.00',
+  },
+  {
+    id: '2',
+    name: '示例客户2',
+    email: 'user2@example.com',
+    image_url: '/customers/customer-2.png',
+    total_invoices: 3,
+    total_pending: '$1,000.00',
+    total_paid: '$4,000.00',
+  },
+];
+
 export async function fetchFilteredCustomers(query: string) {
+  noStore();
+  
+  // 如果在构建环境或没有数据库连接，返回模拟数据
+  if (isVercelBuild || !sql) {
+    console.log('使用模拟筛选客户数据（构建环境）');
+    return mockFilteredCustomers;
+  }
+  
   try {
     const data = await sql<CustomersTableType[]>`
 		SELECT
